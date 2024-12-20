@@ -134,3 +134,51 @@ def decompress_text(compressed_data, huffman_codes):
     end_time = time.time()
     return original_text, end_time - start_time
 
+
+def plot_compression_stats(original_size, compressed_size, compression_ratio):
+    fig, ax = plt.subplots()
+    labels = ['Original Size', 'Compressed Size']
+    sizes = [original_size, compressed_size]
+
+    ax.bar(labels, sizes, color=['blue', 'green'])
+    ax.set_title(f'Compression Ratio: {compression_ratio:.2f}%')
+    ax.set_ylabel('Size (bits)')
+
+    st.pyplot(fig)
+
+def plot_compression_stats(original_size, compressed_size, compression_ratio):
+    fig, ax = plt.subplots()
+    labels = ['Original Size', 'Compressed Size']
+    sizes = [original_size, compressed_size]
+
+    ax.bar(labels, sizes, color=['blue', 'green'])
+    ax.set_title(f'Compression Ratio: {compression_ratio:.2f}%')
+    ax.set_ylabel('Size (bits)')
+
+    st.pyplot(fig)
+
+# Huffman Tree Visualization
+def add_edges(graph, node, pos, x=0, y=0, layer=1, parent=None):
+    if node is not None:
+        pos[node] = (x, -y)
+        if parent:
+            graph.add_edge(parent, node)
+
+        next_y = y + 1
+        next_x = 2 ** (-layer)
+        add_edges(graph, node.left, pos, x - next_x, next_y, layer + 1, node)
+        add_edges(graph, node.right, pos, x + next_x, next_y, layer + 1, node)
+
+def visualize_huffman_tree(root):
+    graph = nx.DiGraph()
+    pos = {}
+
+    add_edges(graph, root, pos)
+
+    labels = {node: node.char if node.char else '' for node in pos}
+
+    plt.figure(figsize=(12, 8))
+    nx.draw(graph, pos, labels=labels, with_labels=True, node_size=500, node_color="black", font_color="white")
+    plt.title("Huffman Tree Visualization")
+    st.pyplot(plt)
+
