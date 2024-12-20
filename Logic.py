@@ -56,6 +56,41 @@ def rle_compress(binary_string):
     compressed.append(f"{count}:{binary_string[-1]}")
     return ','.join(compressed)
 
+# Compression Function
+def compress_file(input_file, output_file, tree_file):
+    with open(input_file, 'r') as f:
+        text = f.read()
+
+    # Huffman Coding
+    root = build_huffman_tree(text)
+    huffman_codes = generate_huffman_codes(root)
+    encoded_text = huffman_encode(text, huffman_codes)
+
+    # Run-Length Encoding
+    rle_output = rle_compress(encoded_text)
+
+    # Write Outputs
+    with open(output_file, 'w') as f:
+        f.write(rle_output)
+    with open(tree_file, 'w') as f:
+        f.write(str(huffman_codes))
+
+    # Compression Ratio
+    original_size = len(text) * 8  # Original in bits
+
+    # Estimate compressed size in bits
+    rle_pairs = rle_output.split(',')
+    compressed_size = sum(math.ceil(math.log2(int(pair.split(':')[0]) + 1)) + 1 for pair in rle_pairs)
+
+    compression_ratio = (original_size - compressed_size) / original_size * 100
+
+    # Output the results
+    print(f"Original Size (bits): {original_size}")
+    print(f"Compressed Size (bits): {compressed_size}")
+    print(f"Compression Ratio: {compression_ratio:.2f}%")
+
+
+
 
 # Example Usage
 if __name__ == "__main__":
