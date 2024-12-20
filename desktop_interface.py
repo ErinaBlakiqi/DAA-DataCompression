@@ -149,3 +149,74 @@ def visualize_huffman_tree(root):
     nx.draw(graph, pos, labels=labels, with_labels=True, node_size=500, node_color="black", font_color="white")
     plt.title("Huffman Tree Visualization")
     plt.show()
+
+# Tkinter GUI
+class CompressionApp:
+    def _init_(self, root):
+        self.root = root
+        self.root.title("Data Compression Tool")
+        self.root.state('zoomed')  # Make the window full-screen
+
+        self.upload_button = tk.Button(self.root, text="Upload Text File", command=self.upload_file)
+        self.upload_button.pack(pady=10)
+
+        self.compress_button = tk.Button(self.root, text="Compress", state=tk.DISABLED, command=self.compress)
+        self.compress_button.pack(pady=10)
+
+        self.text_display = tk.Text(self.root, height=10, width=100)
+        self.text_display.pack(pady=10)
+
+        self.compressed_display = tk.Text(self.root, height=10, width=100)
+        self.compressed_display.pack(pady=10)
+
+        self.stats_label = tk.Label(self.root, text="Compression Stats", font=("Helvetica", 14))
+        self.stats_label.pack(pady=10)
+
+        self.stats_text = tk.Text(self.root, height=5, width=100)
+        self.stats_text.pack(pady=10)
+
+        self.save_button = tk.Button(self.root, text="Save Compressed File", state=tk.DISABLED, command=self.save_file)
+        self.save_button.pack(pady=10)
+
+    def upload_file(self):
+        file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt")])
+        if file_path:
+            with open(file_path, 'r') as file:
+                self.text_display.delete(1.0, tk.END)
+                text = file.read()
+                self.text_display.insert(tk.END, text)
+                self.compress_button.config(state=tk.NORMAL)
+
+    def compress(self):
+        text = self.text_display.get(1.0, tk.END).strip()
+        compressed_data, huffman_codes, root, compression_ratio, original_size, compressed_size, compression_time = compress_text(
+            text)
+
+        self.compressed_display.delete(1.0, tk.END)
+        self.compressed_display.insert(tk.END, compressed_data)
+
+        self.stats_text.delete(1.0, tk.END)
+        stats = f"Original Size: {original_size} bits\n"
+        stats += f"Compressed Size: {compressed_size} bits\n"
+        stats += f"Compression Ratio: {compression_ratio:.4f}%\n"
+        stats += f"Compression Time: {compression_time:.6f} seconds"
+        self.stats_text.insert(tk.END, stats)
+
+        messagebox.showinfo("Compression Complete",
+                            f"Compression completed successfully!\nTime: {compression_time:.6f} seconds")
+
+        self.save_button.config(state=tk.NORMAL)
+
+    def save_file(self):
+        compressed_data = self.compressed_display.get(1.0, tk.END).strip()
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
+        if file_path:
+            with open(file_path, 'w') as file:
+                file.write(compressed_data)
+            messagebox.showinfo("File Saved", f"Compressed file saved as {file_path}")
+
+
+if _name_ == "_main_":
+    root = tk.Tk()
+    app = CompressionApp(root)
+    root.mainloop()
