@@ -56,6 +56,47 @@ def rle_compress(binary_string):
     compressed.append(f"{count}:{binary_string[-1]}")
     return ','.join(compressed)
 
+# Step 5: Decode RLE
+def rle_decompress(rle_data):
+    decompressed = []
+    rle_pairs = rle_data.split(',')
+    for pair in rle_pairs:
+        count, bit = pair.split(':')
+        decompressed.append(bit * int(count))
+    return ''.join(decompressed)
+
+# Step 6: Decode Huffman Encoding
+def huffman_decode(encoded_text, huffman_tree):
+    decoded_text = []
+    current_node = huffman_tree
+    for bit in encoded_text:
+        if bit == '0':
+            current_node = current_node.left
+        else:
+            current_node = current_node.right
+
+        if current_node.char is not None:  # Leaf node
+            decoded_text.append(current_node.char)
+            current_node = huffman_tree  # Reset to the root
+    return ''.join(decoded_text)
+
+# Step 7: Rebuild Huffman Tree from Codes
+def rebuild_huffman_tree(huffman_codes):
+    root = HuffmanNode(None, 0)
+    for char, code in huffman_codes.items():
+        current_node = root
+        for bit in code:
+            if bit == '0':
+                if current_node.left is None:
+                    current_node.left = HuffmanNode(None, 0)
+                current_node = current_node.left
+            else:
+                if current_node.right is None:
+                    current_node.right = HuffmanNode(None, 0)
+                current_node = current_node.right
+        current_node.char = char  # Assign character at the leaf
+    return root
+
 # Compression Function
 def compress_file(input_file, output_file, tree_file):
     with open(input_file, 'r') as f:
@@ -89,8 +130,30 @@ def compress_file(input_file, output_file, tree_file):
     print(f"Compressed Size (bits): {compressed_size}")
     print(f"Compression Ratio: {compression_ratio:.2f}%")
 
+# Decompression Function
+def decompress_file(compressed_file, tree_file, output_file):
+    # Read the compressed file
+    with open(compressed_file, 'r') as f:
+        rle_data = f.read()
 
+    # Read the Huffman tree
+    with open(tree_file, 'r') as f:
+        huffman_codes = eval(f.read())  # Convert string back to dictionary (use with trusted input only)
 
+    # Rebuild the Huffman tree
+    huffman_tree = rebuild_huffman_tree(huffman_codes)
+
+    # Step 1: Decode RLE
+    binary_string = rle_decompress(rle_data)
+
+    # Step 2: Decode Huffman
+    original_text = huffman_decode(binary_string, huffman_tree)
+
+    # Write the decompressed data to the output file
+    with open(output_file, 'w') as f:
+        f.write(original_text)
+
+    print(f"Decompression complete. Output saved to {output_file}.")
 
 # Example Usage
 if __name__ == "__main__":
