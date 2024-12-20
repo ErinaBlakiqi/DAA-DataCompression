@@ -33,7 +33,49 @@ The combination of these two techniques enables efficient text compression with 
 - `tkinter` (for desktop app)
 - `streamlit` (for web interface)
 
-To install the required dependencies, run:
+## Dependencies
+
+Ensure you have the following dependencies installed:
+
+- `heapq` (for implementing the priority queue used in Huffman coding)
+- `collections` (for efficient counting of characters)
+
+## Usage
+
+### Command-Line Usage
+
+To run the program on the command line:
+
+#### Compress a file:
 
 ```bash
-pip install -r requirements.txt
+python main.py
+
+### This will:
+
+- Compress the input text file using Huffman Coding and RLE.
+- Save the compressed data to a file (`compressed.txt`).
+- Store the Huffman tree used for compression to a separate file (`huffman_tree.txt`).
+- Print the compression ratio in the console.
+
+### Decompress a file:
+
+```bash
+python main.py
+
+### This will:
+
+- Decompress the given compressed file using RLE and Huffman decoding.
+- Save the decompressed data to an output file (`decompressed.txt`).
+
+### Web Interface
+
+To use the **Streamlit** web interface, simply run:
+
+```bash
+streamlit run web_interface.py
+
+
+
+
+
