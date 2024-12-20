@@ -182,3 +182,43 @@ def visualize_huffman_tree(root):
     plt.title("Huffman Tree Visualization")
     st.pyplot(plt)
 
+
+# Streamlit GUI
+st.title("Data Compression Tool")
+
+uploaded_file = st.file_uploader("Upload a text file for compression", type=["txt"])
+if uploaded_file is not None:
+    text = uploaded_file.read().decode("utf-8")
+    st.text_area("Original Text", text, height=200)
+
+    if st.button("Compress"):
+        compressed_data, huffman_codes, root, compression_ratio, original_size, compressed_size, compression_time = compress_text(text)
+
+        st.success("Compression Complete")
+        st.text_area("Compressed Data", compressed_data, height=200)
+
+        # Displaying Compression Stats
+        st.write(f"**Original Size (bits):** {original_size}")
+        st.write(f"**Compressed Size (bits):** {compressed_size}")
+        st.write(f"**Compression Ratio:** {compression_ratio:.2f}%")
+        st.write(f"**Compression Time:** {compression_time:.8f} seconds")
+
+        plot_compression_stats(original_size, compressed_size, compression_ratio)
+
+        st.write("### Huffman Tree Visualization")
+        visualize_huffman_tree(root)
+
+        # Save button now directly uses Streamlit's download_button
+        st.download_button(
+            label="Download Compressed File",
+            data=compressed_data,
+            file_name="compressed.txt",
+            mime="text/plain"
+        )
+
+        if st.button("Decompress"):
+            decompressed_text, decompression_time = decompress_text(compressed_data, huffman_codes)
+            st.text_area("Decompressed Text", decompressed_text, height=200)
+            st.write(f"Decompression Time: {decompression_time:.2f} seconds")
+
+
