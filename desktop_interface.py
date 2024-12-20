@@ -106,3 +106,46 @@ def huffman_decode(encoded_text, huffman_tree):
 
 def compress_text(text):
     start_time = time.time()
+
+# Huffman Encoding
+    root = build_huffman_tree(text)
+    huffman_codes = generate_huffman_codes(root)
+    encoded_text = huffman_encode(text, huffman_codes)
+
+ # Run-Length Encoding
+    compressed_data = rle_compress(encoded_text)
+
+    original_size = len(text) * 8  # Original in bits
+    rle_pairs = compressed_data.split(',')
+    compressed_size = sum(math.ceil(math.log2(int(pair.split(':')[0]) + 1)) + 1 for pair in rle_pairs)
+
+    compression_ratio = (original_size - compressed_size) / original_size * 100
+    end_time = time.time()
+
+    return compressed_data, huffman_codes, root, compression_ratio, original_size, compressed_size, end_time - start_time
+
+
+def plot_compression_stats(original_size, compressed_size, compression_ratio):
+    fig, ax = plt.subplots()
+    labels = ['Original Size', 'Compressed Size']
+    sizes = [original_size, compressed_size]
+
+    ax.bar(labels, sizes, color=['blue', 'green'])
+    ax.set_title(f'Compression Ratio: {compression_ratio:.2f}%')
+    ax.set_ylabel('Size (bits)')
+
+    plt.show()
+
+
+def visualize_huffman_tree(root):
+    graph = nx.DiGraph()
+    pos = {}
+
+    add_edges(graph, root, pos)
+
+    labels = {node: node.char if node.char else '' for node in pos}
+
+    plt.figure(figsize=(12, 8))
+    nx.draw(graph, pos, labels=labels, with_labels=True, node_size=500, node_color="black", font_color="white")
+    plt.title("Huffman Tree Visualization")
+    plt.show()
