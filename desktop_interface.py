@@ -50,3 +50,25 @@ def generate_huffman_codes(root, code='', huffman_codes={}):
 
 def huffman_encode(text, huffman_codes):
     return ''.join(huffman_codes[char] for char in text)
+
+# Run-Length Encoding Logic
+def rle_compress(binary_string):
+    compressed = []
+    count = 1
+    for i in range(1, len(binary_string)):
+        if binary_string[i] == binary_string[i - 1]:
+            count += 1
+        else:
+            compressed.append(f"{count}:{binary_string[i - 1]}")
+            count = 1
+    compressed.append(f"{count}:{binary_string[-1]}")
+    return ','.join(compressed)
+
+
+def rle_decompress(rle_data):
+    decompressed = []
+    rle_pairs = rle_data.split(',')
+    for pair in rle_pairs:
+        count, bit = pair.split(':')
+        decompressed.append(bit * int(count))
+    return ''.join(decompressed)
