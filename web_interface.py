@@ -97,5 +97,40 @@ def huffman_decode(encoded_text, huffman_tree):
             current_node = huffman_tree
     return ''.join(decoded_text)
 
+def compress_text(text):
+    start_time = time.time()
 
+    # Huffman Encoding
+    root = build_huffman_tree(text)
+    huffman_codes = generate_huffman_codes(root)
+    encoded_text = huffman_encode(text, huffman_codes)
+
+    # Run-Length Encoding
+    compressed_data = rle_compress(encoded_text)
+
+    original_size = len(text) * 8  # Original in bits
+    rle_pairs = compressed_data.split(',')
+    compressed_size = sum(math.ceil(math.log2(int(pair.split(':')[0]) + 1)) + 1 for pair in rle_pairs)
+
+    compression_ratio = (original_size - compressed_size) / original_size * 100
+    end_time = time.time()
+
+    compression_time = end_time - start_time
+
+    return compressed_data, huffman_codes, root, compression_ratio, original_size, compressed_size, compression_time
+
+def decompress_text(compressed_data, huffman_codes):
+    start_time = time.time()
+
+    # Rebuild Huffman Tree
+    huffman_tree = rebuild_huffman_tree(huffman_codes)
+
+    # Decode RLE
+    binary_string = rle_decompress(compressed_data)
+
+    # Decode Huffman
+    original_text = huffman_decode(binary_string, huffman_tree)
+
+    end_time = time.time()
+    return original_text, end_time - start_time
 
