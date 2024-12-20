@@ -68,4 +68,34 @@ def rle_decompress(rle_data):
         decompressed.append(bit * int(count))
     return ''.join(decompressed)
 
+def rebuild_huffman_tree(huffman_codes):
+    root = HuffmanNode(None, 0)
+    for char, code in huffman_codes.items():
+        current_node = root
+        for bit in code:
+            if bit == '0':
+                if current_node.left is None:
+                    current_node.left = HuffmanNode(None, 0)
+                current_node = current_node.left
+            else:
+                if current_node.right is None:
+                    current_node.right = HuffmanNode(None, 0)
+                current_node = current_node.right
+        current_node.char = char
+    return root
+
+def huffman_decode(encoded_text, huffman_tree):
+    decoded_text = []
+    current_node = huffman_tree
+    for bit in encoded_text:
+        if bit == '0':
+            current_node = current_node.left
+        else:
+            current_node = current_node.right
+        if current_node.char is not None:
+            decoded_text.append(current_node.char)
+            current_node = huffman_tree
+    return ''.join(decoded_text)
+
+
 
